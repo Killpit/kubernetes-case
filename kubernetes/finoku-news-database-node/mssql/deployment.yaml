@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mssql
+spec:
+  serviceName: "mssql"  # Service name for network exposure
+  replicas: 2 # Adjust based on your needs for high availability
+  selector:
+    matchLabels:
+      app: mssql
+  template:
+    metadata:
+      labels:
+        app: mssql
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 10001
+      containers:
+      - name: mssql
+        image: mcr.microsoft.com/mssql/server:2019-CU17  # Consider using a specific version
+        ports:
+        - containerPort: 1433
+          name: tcpsql
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_ENABLE_HADR  # Consider HA configuration if needed
+        - name: MSSQL_AGENT_ENABLED  # Consider enabling agent if needed
+        - name: MSSQL_SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mssql
+              key: MSSQL_SA_PASSWORD
+        livenessProbe:  # Example liveness probe
+          tcpSocket:
+            port: 1433
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe: # Example readiness probe
+          tcpSocket:
+            port: 1433
+          initialDelaySeconds: 30
+          periodSeconds: 20
+      volumeMounts:
+      - name: mssql
+        mountPath: "/var/opt/mssql"
+  volumeClaimTemplates:
+  - metadata:
+      name: mssql
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:  # Example resource requests/limits
+        requests:
+          memory: "2Gi"
+          cpu: "1"
+        limits:
+          memory: "4Gi"
+          cpu: "2"
