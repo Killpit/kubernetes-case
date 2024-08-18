@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: finoku-logging-service
+  labels:
+    environment: production
+    team: logging

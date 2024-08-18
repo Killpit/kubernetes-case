@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finoku-logging-service
+spec:
+  replicas: 3  # Adjust the desired number of replicas
+  selector:
+    matchLabels:
+      app: finoku-logging-service
+  template:
+    metadata:
+      labels:
+        app: finoku-logging-service
+    spec:
+      containers:
+      - name: finoku-logging-service
+        image: finoku-logging-service:latest
+        ports:
+        - containerPort: 443
