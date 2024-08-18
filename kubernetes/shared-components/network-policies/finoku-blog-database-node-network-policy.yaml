@@ -1,0 +1,10 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicyNetworkPolicy
+metadata:
+  name: default-deny
+  namespace: finoku-blog-database
+spec:
+  selector: all()
+  types:
+    - Ingress
+    - Egress

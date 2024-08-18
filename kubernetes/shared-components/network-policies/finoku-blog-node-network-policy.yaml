@@ -1,0 +1,9 @@
+apiVersion: networking.calico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-ingress-to-service
+  namespace: finoku-blog-node
+spec:
+  ingress:
+  - from:
+    - all:
