@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: logstash
+  name: kibana
   labels:
     app: kibana
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: logstash
+      app: kibana
   template:
     metadata:
       labels:
-        app: logstash
+        app: kibana
     spec:
       containers:
-      - name: logstash
-        image: docker.elastic.co/logstash/logstash:8.15.0
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana:8.15.0
         resources:
           limits:
             cpu: 1Gi
           requests:
             cpu: 100m
         env:
-          - name: LOGSTASH_URL
-            value: http://logstash:5601
+          - name: ELASTICSEARCH_URL
+            value: http://elasticsearch:9200
         ports:
-        - containerPort: 5044
+        - containerPort: 5601
