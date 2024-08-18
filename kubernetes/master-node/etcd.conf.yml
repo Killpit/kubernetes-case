@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: etcd
+  namespace: kube-system  
+  labels:
+    app: etcd
+spec:
+  automountServiceAccountToken: false
+  serviceAccountName: etcd  # Replace with your service account name
+  securityContext:
+    fsGroup: 2000  # Adjust as needed
+  containers:
+  - name: etcd
+    image: etcd:latest  
+    command:
+    - /usr/local/bin/etcd
+    - --data-dir=/var/lib/etcd
+    - --name=master
+    - --cert-file=/etc/etcd/ssl/server.pem
+    - --key-file=/etc/etcd/ssl/server-key.pem
+    - --peer-cert-file=/etc/etcd/ssl/peer.pem
+    - --peer-key-file=/etc/etcd/ssl/peer-key.pem
+    - --listen-client-urls=https://0.0.0.0:2379
+    - --listen-peer-urls=https://0.0.0.0:2380
+    # Additional etcd configuration options (refer to etcd documentation)
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+    volumeMounts:
+    - name: etcd-data
+      mountPath: /var/lib/etcd
+    - name: etcd-ssl
+      mountPath: /etc/etcd/ssl
+  volumes:
+  - name: etcd-data
+    persistentVolumeClaim:
+      claimName: etcd-data-pvc  # Replace with your PVC name
+  - name: etcd-ssl
+    secret:
+      secretName: etcd-ssl

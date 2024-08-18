@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: kube-apiserver
+    tier: control-plane
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  containers:
+  - name: kube-apiserver
+    # Removed unnecessary shell command wrapper
+    command:
+    - /usr/local/bin/kube-apiserver
+    # Removed most GCP-related arguments
+    args:
+    - --v=2
+    - --allow-privileged=false  # Consider security implications before enabling
+    - --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt
+    - --etcd-servers=http://127.0.0.1:2379  # Replace with actual etcd server address
+    - --secure-port=443
+    - --tls-cert-file=/etc/srv/kubernetes/pki/apiserver.crt
+    - --tls-private-key-file=/etc/srv/kubernetes/pki/apiserver.key
+    - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+    - --requestheader-client-ca-file=/etc/srv/kubernetes/pki/aggr_ca.crt
+    # ... other non-GCP arguments (if needed)
+    image: docker.io/kubernetes/kube-apiserver:v1.9.7  # Replace with desired version tag
+    livenessProbe:
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 15
+      timeoutSeconds: 15
+    ports:
+    - containerPort: 443
+      hostPort: 443
+      name: https
+    - containerPort: 8080
+      hostPort: 8080
+      name: local
+    resources:
+      requests:
+        cpu: 250m
+    # Removed most volume mounts as they were GCP specific
+    volumeMounts:
+    - mountPath: /etc/srv/kubernetes
+      name: srvkube
+      readOnly: true
+    - mountPath: /var/log/kube-apiserver.log
+      name: logfile
+      readOnly: false
+  volumes:
+  # Removed most volumes as they were GCP specific
+  - hostPath:
+      path: /etc/srv/kubernetes
+    name: srvkube
+  - hostPath:
+      path: /var/log/kube-apiserver.log
+      type: FileOrCreate
+    name: logfile

@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: kube-scheduler
+    tier: control-plane
+  name: kube-scheduler
+  namespace: kube-system
+spec:
+  containers:
+  - name: kube-scheduler
+    image: k8scn/kube-scheduler-amd64  # Replace with desired version
+    command:
+    - /usr/local/bin/kube-scheduler
+    - --v=2
+    # Consider adding scheduler specific flags based on your environment
+    - --kubeconfig=/etc/kubernetes/kube-scheduler.conf 1>>/var/log/kube-scheduler.log 2>&1
+    livenessProbe:
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10251
+      initialDelaySeconds: 15
+      timeoutSeconds: 15
+    resources:
+      requests:
+        cpu: 75m
+    volumeMounts:
+    - mountPath: /etc/kubernetes/kube-scheduler.conf
+      name: kube-scheduler-config
+      readOnly: true
+    - mountPath: /var/log/kube-scheduler.log
+      name: logfile
+      readOnly: false
+  volumes:
+  - name: kube-scheduler-config
+    # Replace with ConfigMap or Secret for configuration
+  - name: logfile
+    hostPath:
+      path: /var/log/kube-scheduler.log
+      type: FileOrCreate
