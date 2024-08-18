@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finoku-news-ingress-rules
+  annotations:
+    kubernetes.io/ingress.class: nginx  # Replace with your Ingress controller class
+spec:
+  tls:
+  - hosts:
+    - news.finoku.com
+    secretName: finoku-news-tls
+  rules:
+  - host: news.finoku.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: finoku-news-website
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: finoku-news-panel-service
+            port:
+              number: 80
+      - path: /admin
+        pathType: Prefix
+        backend:
+          service:
+            name: finoku-news-admin-service
+            port:
+              number: 80
