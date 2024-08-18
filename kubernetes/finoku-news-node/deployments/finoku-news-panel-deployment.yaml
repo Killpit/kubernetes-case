@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: finoku-news-admin-panel-deployment
+  name: finoku-news-panel-deployment
 spec:
   replicas: 3  # Adjust the desired number of replicas
   selector:
     matchLabels:
-      app: finoku-news-admin-panel
+      app: finoku-news-panel
   template:
     metadata:
       labels:
-        app: finoku-news-admin-panel
+        app: finoku-news-panel
     spec:
       containers:
-      - name: finoku-news-admin-panel
-        image: finoku-news-admin-panel:latest
+      - name: finoku-news-website
+        image: finoku-news-panel:latest
         ports:
         - containerPort: 443

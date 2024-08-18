@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finoku-news-website-deployment
+spec:
+  replicas: 3  # Adjust the desired number of replicas
+  selector:
+    matchLabels:
+      app: finoku-news-website
+  template:
+    metadata:
+      labels:
+        app: finoku-news-website
+    spec:
+      containers:
+      - name: finoku-news-website
+        image: finoku-news-website:latest
+        ports:
+        - containerPort: 443
