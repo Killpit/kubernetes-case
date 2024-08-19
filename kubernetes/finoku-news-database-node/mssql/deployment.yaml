@@ -42,6 +42,19 @@ spec:
             port: 1433
           initialDelaySeconds: 30
           periodSeconds: 20
+      - name: liveness
+    image: registry.k8s.io/busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
       volumeMounts:
       - name: mssql
         mountPath: "/var/opt/mssql"

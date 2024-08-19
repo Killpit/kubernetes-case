@@ -18,17 +18,30 @@ spec:
         image: redis:latest
         command: ["redis-server", "/data/redis.conf"]
         ports:
-        - containerPort: 6380
+        - containerPort: 6379
         resources:
           limits:
             cpu: "512m"
             memory: "1Gi"
           requests:
-            cpu: "1Gi"
-            memory: "2Gi"
+            cpu: "256m"
+            memory: "512Mi"
         volumeMounts:
         - name: redis-persistent-storage
           mountPath: /data
+      - name: liveness
+        image: registry.k8s.io/busybox
+        args:
+        - /bin/sh
+        - -c
+        - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/healthy
+          initialDelaySeconds: 5
+          periodSeconds: 5
       volumes:
       - name: redis-persistent-storage
         persistentVolumeClaim:

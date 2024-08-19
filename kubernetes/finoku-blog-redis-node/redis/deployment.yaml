@@ -29,6 +29,19 @@ spec:
         volumeMounts:
         - name: redis-persistent-storage
           mountPath: /data
+      - name: liveness
+    image: registry.k8s.io/busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
       volumes:
       - name: redis-persistent-storage
         persistentVolumeClaim:

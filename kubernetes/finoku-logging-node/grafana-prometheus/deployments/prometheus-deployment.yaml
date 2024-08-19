@@ -14,15 +14,28 @@ spec:
         app: prometheus-server
     spec:
       containers:
-        - name: prometheus
-          image: prom/prometheus
-          ports:
-            - containerPort: 9090
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/prometheus
-      volumes:
+      - name: prometheus
+        image: prom/prometheus
+        ports:
+        - containerPort: 9090
+        volumeMounts:
         - name: config-volume
-          configMap:
-            name: prometheus-server-conf
-            defaultMode: 420
+          mountPath: /etc/prometheus
+      - name: liveness
+        image: registry.k8s.io/busybox
+        args:
+        - /bin/sh
+        - -c
+        - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/healthy
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: config-volume
+        configMap:
+          name: prometheus-server-conf
+          defaultMode: 420
